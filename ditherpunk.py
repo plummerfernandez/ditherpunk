@@ -49,11 +49,28 @@ def createDitherTile():
 	print str(pipe.read())
 
 
+def hlinesDither(input_img, output_img):
+	#First you need to ammend the thresholds.xml file to include the dither pattern
+	#
+	#   <threshold map="hlines12x4" alias="hlines">
+    #    <description>Horizontal Lines 12x4</description>
+    #     <levels width="12" height="4" divisor="9">
+    #        7 8 8 8 8 7 6 6 5 5 5 6
+    #        2 1 1 1 1 2 3 4 4 4 3 3
+    #        6 6 5 5 5 6 7 8 8 8 8 7
+    #        3 4 4 4 3 3 2 1 1 1 1 2
+    #     </levels>
+    #   </threshold>
+    #
+    #convert test.png -ordered-dither hlines test-hlines.gif
+    pipe = subprocess.Popen(["convert",input_img,"-ordered-dither","hlines",output_img,], stderr=subprocess.PIPE).stderr
+    print str(pipe.read())
 
 
 
 #### USAGE #####
 #createDitherTile()
+hlinesDither("test.png","test-hlines.gif")
 #print "Created dither tile"
 ################
 
