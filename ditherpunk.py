@@ -42,27 +42,27 @@ c7x7w                         Circles 7x7 (white)
 import subprocess, os
 import tempfile, time, datetime
 
-#DITHER.PY
-
-# montage dpat_hlines.gif   -filter box   -geometry 60x20+2+0 \
-#           -tile x1 -background none  -frame 2   dpat_hlines_images.gif
-#   convert gradient.png  dpat_hlines.gif  \
-#           -virtual-pixel tile  -fx 'u[floor((n-1)*u)+1]' \
-#           dgrad_dpat_hlines.gif
-#   convert shadow.png dpat_hlines.gif  -channel A \
-#           -virtual-pixel tile  -fx 'u[floor((n-1)*u)+1].g' \
-#           shadow_dpat_hlines.gif
-
 
 def createDitherTile():
-	pipe = subprocess.Popen(["convert", filename, "-blur", "1x2", tempname], stderr=subprocess.PIPE).stderr
+	#convert -size 2x2 xc:black \( +clone -draw 'fill white line 0,0 1,0' \) xc:white dpat_hlines2x2test3.gif
+	pipe = subprocess.Popen(["convert", "-size", "2x2", "xc:black", "(", "+clone", "-draw", " ""fill white line 0,0 1,0"" ", ")", "xc:white", "dpat_hlines2x2.gif",], stderr=subprocess.PIPE).stderr
 	print str(pipe.read())
 
 
 
-convert concordia.jpg dpat_hlines2x2.gif  -channel A \
-          -virtual-pixel tile  -fx 'u[floor((n-1)*u)+1].g' \
-          shadow_dpat_hlines2x2.gif
 
 
-          convert concordia.jpg  dpat_hlines2x2.gif -virtual-pixel tile  -fx 'u[floor((n-1)*u)+1]' condgrad_hlines2x2.gif
+#### USAGE #####
+#createDitherTile()
+#print "Created dither tile"
+################
+
+
+
+
+# convert concordia.jpg dpat_hlines2x2.gif  -channel A \
+#           -virtual-pixel tile  -fx 'u[floor((n-1)*u)+1].g' \
+#           shadow_dpat_hlines2x2.gif
+
+
+#           convert concordia.jpg  dpat_hlines2x2.gif -virtual-pixel tile  -fx 'u[floor((n-1)*u)+1]' condgrad_hlines2x2.gif
