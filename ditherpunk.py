@@ -63,6 +63,8 @@ def hlinesDither(input_img, output_img):
     #   </threshold>
     #
     #convert test.png -ordered-dither hlines test-hlines.gif
+    #convert test.png -ordered-dither h16x16o test-h16x16o.gif
+    
     pipe = subprocess.Popen(["convert",input_img,"-ordered-dither","hlines",output_img,], stderr=subprocess.PIPE).stderr
     print str(pipe.read())
 
@@ -88,11 +90,121 @@ def hlinesDitherGray(input_img, output_img):
     pipe = subprocess.Popen(["convert",tempng,"-ordered-dither","hlines",output_img,], stderr=subprocess.PIPE).stderr
     print str(pipe.read())
 
+def mpflinesDitherGray(input_img, output_img):
+	#First you need to ammend the thresholds.xml file to include the dither pattern
+
+    #convert test.png -ordered-dither hlines test-hlines.gif
+    temp = tempfile.mkstemp(suffix = ".png")
+    tempng = temp[1]
+
+    pipe = subprocess.Popen(["convert",input_img,"-colorspace", "Gray",tempng,], stderr=subprocess.PIPE).stderr
+    print str(pipe.read())
+    pipe = subprocess.Popen(["convert",tempng,"-ordered-dither","mpf2lines",output_img,], stderr=subprocess.PIPE).stderr
+    print str(pipe.read())
+
+def diagDitherGray(input_img, output_img):
+	#First you need to ammend the thresholds.xml file to include the dither pattern
+	#
+	#  <threshold map="diag5x5" alias="diag">
+    #   <description>Simple Diagonal Line Dither</description>
+    #    <levels width="5" height="5" divisor="6">
+    #       4 2 1 3 5
+    #       2 1 3 5 4
+    #       1 3 5 4 2
+    #       3 5 4 2 1
+    #       5 4 2 1 3
+    #    </levels>
+    #  </threshold>
+    #
+    #convert test.png -ordered-dither diag test-diaggray.gif
+    temp = tempfile.mkstemp(suffix = ".png")
+    tempng = temp[1]
+
+    pipe = subprocess.Popen(["convert",input_img,"-colorspace", "Gray",tempng,], stderr=subprocess.PIPE).stderr
+    print str(pipe.read())
+    pipe = subprocess.Popen(["convert",tempng,"-ordered-dither","diag",output_img,], stderr=subprocess.PIPE).stderr
+    print str(pipe.read())
+
+
+def bayerDitherGray(input_img, output_img): 
+	#found here: https://github.com/polemon/dither/blob/master/ordered.py
+	#First you need to ammend the thresholds.xml file to include the dither pattern
+
+    #convert test.png -ordered-dither diag test-diaggray.gif
+    temp = tempfile.mkstemp(suffix = ".png")
+    tempng = temp[1]
+
+    pipe = subprocess.Popen(["convert",input_img,"-colorspace", "Gray",tempng,], stderr=subprocess.PIPE).stderr
+    print str(pipe.read())
+    pipe = subprocess.Popen(["convert",tempng,"-ordered-dither","bayer3x3",output_img,], stderr=subprocess.PIPE).stderr
+    print str(pipe.read())
+
+
+def contrastAlgoGray(ditheralgo,input_img,output_img):
+    temp = tempfile.mkstemp(suffix = ".png")
+    tempng = temp[1]
+    temp2 = tempfile.mkstemp(suffix = ".png")
+    tempng2 = temp2[1]
+
+    pipe = subprocess.Popen(["convert",input_img,"-colorspace", "Gray",tempng,], stderr=subprocess.PIPE).stderr
+    print str(pipe.read())
+    pipe = subprocess.Popen(["convert",tempng,"-contrast", "-contrast",tempng2,], stderr=subprocess.PIPE).stderr
+    print str(pipe.read())
+    pipe = subprocess.Popen(["convert",tempng2,"-ordered-dither",ditheralgo,output_img,], stderr=subprocess.PIPE).stderr
+    print str(pipe.read())	
+    pipe.close()
+
+def newsDitherGray(input_img, output_img):
+	#First you need to ammend the thresholds.xml file to include the dither pattern
+
+    #convert test.png -ordered-dither diag test-diaggray.gif
+    temp = tempfile.mkstemp(suffix = ".png")
+    tempng = temp[1]
+
+    pipe = subprocess.Popen(["convert",input_img,"-colorspace", "Gray",tempng,], stderr=subprocess.PIPE).stderr
+    print str(pipe.read())
+    pipe = subprocess.Popen(["convert",tempng,"-ordered-dither","news8x8",output_img,], stderr=subprocess.PIPE).stderr
+    print str(pipe.read())    
+
+
+
+def vidToStills(input_vid, output_dir):
+	# ffmpeg -i video.mpg -r 1 -f image2 ffmpeg_temp/%05d.png
+	pipe = subprocess.Popen(["ffmpeg", "-i",input_vid,"-r","1","-f","image2",output_dir+"%07d"+".png"], stderr=subprocess.PIPE).stderr
+	print str(pipe.read())
+
+
+def stillsToDitherStills(ditherdef, input_dir, output_dir):
+	for f in os.listdir(input_dir):
+		print f
+		ditherdef("mpf2lines",input_dir+f, output_dir+f)
+		time.sleep(0.5)
+
+
+def stillsToDitherStills2(ditherdef, input_dir, output_dir):
+	#for f in os.listdir(input_dir):
+	for i in range(620, 712):
+		print i
+		f= str('%07d' % i) + ".png"
+		print f
+		ditherdef("mpf2lines",input_dir+f, output_dir+f)
+		time.sleep(0.5)
+
 #### USAGE #####
 #createDitherTile()
 #hlinesDither("test.png","test-hlines.gif")
-hlinesDitherGray("test.png","test-hlinesGray.gif")
+#hlinesDitherGray("test.png","test-hlinesGray.gif")
+#mpflinesDitherGray("test.png","test-mpf2linesGray.gif")
+#bayerDitherGray("test.png","test-bayerGray.gif")
+#newsDitherGray("test.png","test-newsGray.gif")
 #print "Created dither tile"
+
+#inputVid = "/Users/plummerfernandez/Documents/plummerfernandez/16_01_02_Jumpers/film/lune.avi"
+#outputDir = "/Users/plummerfernandez/Documents/plummerfernandez/16_01_02_Jumpers/film/stills/"
+#vidToStills(inputVid,outputDir)
+ditherInputDir = "/Users/plummerfernandez/Documents/plummerfernandez/16_01_02_Jumpers/film/stills/"
+ditherOutputDir = "/Users/plummerfernandez/Documents/plummerfernandez/16_01_02_Jumpers/film/ditherstills2/"
+stillsToDitherStills2(contrastAlgoGray,ditherInputDir,ditherOutputDir)
 ################
 
 
